@@ -3,28 +3,42 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}Arts and Crafts Courses{% endblock %}</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" >
         <style media="all"></style>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-        <link rel="stylesheet" href="{% static 'orders/css/main.css' %}" >
-        <link rel="shortcut icon" href="{% static 'orders/favicon.ico' %}">
+        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>        
 
-        {% block head %}{% endblock %}
+        <link rel="stylesheet" href="{% static 'courses/css/main.css' %}" >
+        <link rel="shortcut icon" href="{% static 'courses/favicon.ico' %}">
+        <script src="{% static 'courses/js/main.js' %}"></script>
+        <script type="text/babel" src="{% static 'courses/js/mainreact.jsx' %}"></script>
+
     </head>
     <body>
         <header>
             <div class="MyContainer" rol="main">
-                <h2>CAPSTONE PROYECT</h2>
+                <h2>Arts and Crafts Courses</h2>
             </div>
         </header>
 
         <div class="MyContainer">
+             {% if user.is_authenticated %}
+             <small>Welcome</small>&nbsp;<strong>{{user.first_name }}&nbsp;{{user.last_name }}</strong>&nbsp;
+             [ <a href="{% url 'logout' %}">Logout</a> ]
+             {% endif %}&nbsp;
+             [ <a href="#">Show Cart</a> ]&nbsp;
+
             {% block body %}
             {% endblock %}
         </div>
+        
+        <!-- A hidden form to generate CSRF token - For pages not using forms--> 
+        <form type="hidden">{% csrf_token %}</form>            
 
         <footer>
             <div class="MyContainer">

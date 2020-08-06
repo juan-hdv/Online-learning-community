@@ -1,0 +1,75 @@
+
+/*  Flat color palette (full) downloaded from
+ *  http://htmlcolorcodes.com/color-charts/
+ *
+ *  Check out our powerful color picker
+ *  http://htmlcolorcodes.com/color-picker/
+ *
+ *  Want to learn more about colors in SCSS?
+ *  http://htmlcolorcodes.com/tutorials/
+ *
+ *  - - - - - - - - - - - - - - - - - - 
+ *  Credits:
+ *
+ *  Original color palette by
+ *  http://designmodo.github.io/Flat-UI/
+ *
+  */
+
+/* Turquoise */
+%turquoise { color: #1abc9c; }
+%turquoise-50 { color: #e8f8f5; }
+%turquoise-100bk { background-color: #d1f2eb; }
+%turquoise-200bk { background-color: #a3e4d7; }
+%turquoise-300 { color: #76d7c4; }
+%turquoise-400 { color: #48c9b0; }
+%turquoise-500bk { background-color: #1abc9c; }
+%turquoise-600 { color: #17a589; }
+%turquoise-700 { color: #148f77; }
+%turquoise-800 { color: #117864; }
+%turquoise-900 { color: #0e6251; }
+
+/* Peter River */
+%peter-river { color: #3498db; }
+%peter-river-50bk { background-color: #ebf5fb; }
+%peter-river-100bk { background-color: #d6eaf8; }
+%peter-river-200bk { background-color: #aed6f1; }
+.peter-river-300 { color: #85c1e9; }
+.peter-river-400 { color: #5dade2; }
+.peter-river-600 { color: #2e86c1; }
+%peter-river-700bk { background-color: #2874a6; }
+%peter-river-700 { color: #2874a6; }
+.peter-river-800 { color: #21618c; }
+%peter-river-900bk { background-color: #1b4f72; }
+
+/* Sunflower */
+%sunflower { color: #f1c40f; }
+%sunflowerbk { background-color: #f1c40f; }
+.sunflower-50 { color: #fef9e7; }
+.sunflower-100 { color: #fcf3cf; }
+.sunflower-200 { color: #f9e79f; }
+.sunflower-300 { color: #f7dc6f; }
+.sunflower-400 { color: #f4d03f; }
+.sunflower-500 { color: #f1c40f; }
+.sunflower-600 { color: #d4ac0d; }
+.sunflower-700 { color: #b7950b; }
+%sunflower-800 { color: #9a7d0a; }
+.sunflower-900 { color: #7d6608; }
+
+/* Silver */
+%silver { color: #bdc3c7; }
+%silver-50bk { background-color: #f8f9f9; }
+%silver-100bk { background-color: #f2f3f4; }
+%silver-200bk { background-color: #e5e7e9; }
+%silver-300bk { background-color: #d7dbdd; }
+.silver-400 { color: #cacfd2; }
+.silver-500 { color: #bdc3c7; }
+.silver-600 { color: #a6acaf; }
+.silver-700 { color: #909497; }
+.silver-800 { color: #797d7f; }
+%silver-800bk { background-color: #797d7f; }
+%silver-900bk { background-color: #626567; }
+
+/*  Want more? Check our our other color palettes at
+ *  http://htmlcolorcodes.com/color-charts/
+ */

@@ -25,8 +25,10 @@ SECRET_KEY = 'qC2sb5`5~zC^Obe4T"e}8vg]e%$xt5T#MoF_8t?i]{eGp=U!$U';
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
+# APPLICATION CONSTANTS
+FILTER_INITIAL_NAME = "All categories"
 
 # Application definition
 
@@ -63,6 +65,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "courses.context_processors.settings",
             ],
         },
     },
@@ -115,9 +118,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+# For media files uploades by user
+MEDIA_ROOT = os.path.join(BASE_DIR, 'courses/media')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
+MEDIA_URL = '/media/'

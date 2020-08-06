@@ -1,0 +1,173 @@
+{% extends 'courses/layout.html' %}
+{% load static %}
+
+
+{% block title %}
+    Arts and Crafts Courses 
+{% endblock %}
+
+{% block body %}
+	<div align="center">
+		<h1>
+			Course Catalog&nbsp;
+			<small>[&nbsp;<span id="Categories" class="mb-2">{{ settings.FILTER_INITIAL_NAME }}</span>&nbsp;]</small>
+		</h1>
+		
+	</div>
+	<section class="row">
+		<div align="center">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="card-title">Filter Categories</h5>
+					{% if not categories %}
+					<h4 class="card-title">No categories to filter.</h4>
+					{% endif %}
+				</div>
+				{% if categories %}
+				<ul class="list-group list-group-flush">
+					<li  class="list-group-item">
+						<a id="card-link-0" class="card-link display-5" href="javascript:;" 
+						   data-categoryid="0" 
+						   data-categoryname="{{ settings.FILTER_INITIAL_NAME }}" 
+						   data-selector="category-entry">{{ settings.FILTER_INITIAL_NAME }}</a>
+					</li>
+					{% for c in categories %}
+					<li  class="list-group-item">
+						<a id="card-link-{{c.id}}" class="card-link" href="javascript:;" 
+						   data-categoryid="{{c.id}}" 
+						   data-categoryname="{{ c.name }}" 
+						   data-selector="category-entry">{{ c.name }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			</div>			
+		</div>
+	    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 col-xl-9">
+			<div class="card-columns">
+			 	{% if not catalog %}
+				<div class="card card-body">
+					<div>
+						<h5 class="card-title">No courses available so far.</h5>
+				    	<p class="card-text">
+				    	Please contact the site administrator.
+				    	</p>
+					</div>
+				</div>			 	
+			 	{% endif %}
+
+				{% for c in catalog %}
+				<div class="card card-body" 
+					 id="card-{{c.id}}"
+					 data-courseid="{{c.id}}" 
+				     data-categories="[{% for g in c.categories.all %}{{g.id}}{% if not forloop.last%},{% endif %}{% endfor %}]"
+				     data-selector="course-entry">
+					<img class="card-img-top" src="/media/{{c.image}}" alt="{{c.name}}">
+					<div class="mt-3">
+						<h5 class="card-title">{{c.name}}</h5>
+				    	<p class="card-text">
+				    	{{c.description|truncatewords:15 }}
+				    	<p />
+					    	[{% for g in c.categories.all %}{{g.name}}{% if not forloop.last%},{% endif %}{% endfor %}]
+					    	<br><br>
+					    	<small class="text-muted">By&nbsp;{{c.provider}}</small>
+				    	</p>
+				    	<!-- Button trigger modal -->
+				    	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ c.id }}">Details</button>
+					</div>
+				</div>
+
+				<!-- Cart Form -->
+				<form action="{% url 'addtocart' %}" method="post">
+				{% csrf_token %}
+
+				<!-- Modal -->
+				<div class="modal fade" id="modal-{{ c.id }}" tabindex="-1" role="dialog" aria-labelledby="modal-{{ c.id }}-Tittle" aria-hidden="true">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title">
+									{{c.name}}&nbsp;<small class="text-muted">By&nbsp;{{c.provider}}</small>
+								</h4>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div> <!-- modal-header -->
+							<div class="modal-body">
+								<!-- Course INFO -->
+								<div class="form-group">
+									<div class="card card-body">
+										<img class="card-img-top" src="/media/{{c.image}}" alt="{{c.name}}">
+								    	<p class="mt-3">
+								    		{{ c.description }}
+								    	</p>
+									</div>
+									<div class="card-footer">
+										<strong>Price:</strong>&nbsp;
+										$&nbsp;<span id="modal-{{ c.id }}-coursePrice" value="{{ c.price }}">{{ c.price }}</span>
+										&nbsp;&nbsp;
+										{% if c.maxFreeAdds > 0 %}
+										You can select <span id="modal-{{ c.id }}-courseAdds" value="{{c.maxFreeAdds}}">{{c.maxFreeAdds}}</span> of {{c.maxFreeAdds}} <span class="text-success">free</span> add(s).
+										{% endif %}
+									</div>
+									<input id="id_course" name="id_course" value="{{ c.id }}" hidden>
+								</div>
+
+								<!-- Course Adds -->
+								{% if c.adds.all %}
+								<div class="form-group">
+									<div class="form-group">
+										<strong class="mb-2">Bellow some free and charged options you can add to your order</strong>
+										{% with numcols=0 %}
+										<table class="addsTable">
+										<tr>
+										{% for a in c.adds.all %}
+											{% cycle 1 2 as numcols silent %}
+											<td class="ch_{{ numcols }}">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" class="check-{{c.id}}" data-addid="{{a.id}}" data-courseid="{{c.id}}"data-extraprice="{{ a.extraprice }}" data-name="{{ a.name }}" data-free="{{ a.free }}" value="{{ a.id }}-{{ a.extraprice }}" name="courseAdds" id="ca-{{ c.id }}-{{a.id}}">
+														&nbsp;{{ a.name }}
+														&nbsp;{% if a.free %}<small class="text-success">[Free]</small>{% endif %}
+														{% if a.extraprice != 0 %}
+														(+${{ a.extraprice }})
+														{% endif %}
+													</label>
+												</div>
+											</td>
+										{% if numcols == 2 %}
+										</tr>
+										{% endif %}
+										{% endfor %}
+										{% if numcols == 1 %}
+											<td>&nbsp;</td>
+										</tr>
+										{% endif %}
+										</table>
+										{% resetcycle %}
+										{% endwith %}
+									</div>
+								</div> <!-- form-group cousre Adds -->
+								{% else %}
+								<h5 class="ml-2">
+									<small class="text-muted">No adds to select.</small>&nbsp;
+									{% if c.maxFreeAdds > 0 %}
+									<small class="text-danger">Please contact support, you must be offered {{c.maxFreeAdds}} free adds.</small>
+									{% endif%}
+								</h5>
+								{% endif %}	<!-- End course Adds -->
+							</div> <!-- modal-body -->
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+								<button type="submit" class="btn btn-primary">Add to my order</button>
+							</div>
+						</div> <!-- modal-content -->
+					</div> <!-- modal-dialog -->
+				</div>
+				<!-- END Modal -->
+				</form>					
+				{% endfor %}
+			</div>
+	    </div>
+	</section>
+{% endblock %}

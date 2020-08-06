@@ -6,6 +6,14 @@ class User(AbstractUser):
 	def __str__(self):
 		return f"{self.username} ({self.email})"
 
+# Course provider
+class CourseProvider(models.Model):
+	name = models.CharField(max_length=128)
+	active = models.BooleanField(default=True)	
+
+	def __str__(self):
+		return f"{self.name}"
+
 # Course catalog
 class Course(models.Model):
 	# When a course must no appear in the catalog, set active = False (do not delete it)
@@ -14,15 +22,15 @@ class Course(models.Model):
 	image = models.CharField(max_length=256) # image name
 	price = models.FloatField(default=0.0)
 	maxFreeAdds = models.IntegerField(default=0)
-	active = models.BooleanField(default=False)
+	provider = models.ForeignKey(CourseProvider, on_delete=models.PROTECT, default=1, blank=True) # One course have one provider / One provider is related with many courses
+	active = models.BooleanField(default=True)
 
 	def __str__(self):
 		return f"[{self.name}] maxFreeAddsfree({self.maxFreeAdds}) (${self.price}) active[{self.active}]"
-
 # Course category
 class CourseCategory(models.Model):
 	name = models.CharField(max_length=64)
-	courses = models.ManyToManyField(Course,related_name="categories") # One Category relates to Many Courses / One course to many Categories
+	courses = models.ManyToManyField(Course,related_name="categories", blank=True) # One Category relates to Many Courses / One course to many Categories
 
 	def __str__(self):
 		return f"{self.name}"
@@ -32,8 +40,8 @@ class CourseAdd(models.Model):
 	name = models.CharField(max_length=128)
 	free = models.BooleanField(default=False) # If true add is fre of charge and extraprice is 0
 	extraprice = models.FloatField(default=0.0)
-	course = models.ForeignKey(Course, on_delete=models.PROTECT) # One course have many possible Adds / One add is related with only one course
-	active = models.BooleanField(default=False)
+	course = models.ForeignKey(Course, on_delete=models.PROTECT, related_name="adds", blank=True) # One add is related with only one course / One course have many possible Adds
+	active = models.BooleanField(default=True)
 
 	def __str__(self):
 		return f"[{self.name}] --{self.free}--(${self.extraprice}) active[{self.active}]"
@@ -41,28 +49,28 @@ class CourseAdd(models.Model):
 # Order
 class Order(models.Model):
 	datetime = models.DateTimeField(auto_now=False, auto_now_add=True) # default=timezone.now
-	client = models.OneToOneField(User,on_delete=models.CASCADE)
+	client = models.ForeignKey(User, related_name="orders", on_delete=models.CASCADE) # One Order is related with only one User / One User have many possible Orders
 	price = models.FloatField(default=0.0)
-	active = models.BooleanField(default=False) # An inactive order is one already payed and served 
+	active = models.BooleanField(default=True) # An inactive order is one already payed and served 
 
 	def __str__(self):
-		return f"[{self.datetime}] {self.client.username} {self.price} active[{self.active}]"
+		return f"({self.id}) Dt[{self.datetime}] {self.client.username} {self.price} active[{self.active}] nItems({self.items.count()})"
 
-# Order Item - Name and code of the ordered Course
+# Order Item - Code of the ordered Course
 class OrderItem(models.Model):
-	# productcod = ForeignKey(Course, on_delete=models.CASCADE) # One Order relates to Many products (Courses)
+	course = models.ForeignKey(Course, related_name="orders", on_delete=models.CASCADE, default=1, blank=True) # One OrderItem relates one Course / One course with many orderItems
 	quantity = models.IntegerField(default=0)
 	price = models.FloatField(default=0.0) # Total order due amount
-	order = models.ForeignKey(Order, on_delete=models.CASCADE) # One Order relates to Many order-Items / On items relates to One order
+	order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE) # One Order relates to Many order-Items / On items relates to One order
 	
 	def __str__(self):
-		return f"[{self.productcod.id}] ({self.quantity}) (${self.price}) Ord[{order.id}]"
+		return f"({self.id}) Course[{self.course.name}] Q({self.quantity}) (${self.price}) ParentOrder({self.order.id}) nSubitems({self.subitems.count()})"
 
-# Order Subitem - Name and code of the ordered Product Ingredient or add for a Course
+# Order Subitem - Code of the ordered add for a Course
 class OrderSubitem(models.Model):
-	addcod = models.ForeignKey(CourseAdd, on_delete=models.CASCADE) # One Course Add relates to Many order Subitems / One subitem relates to one add
+	addcod = models.ForeignKey(CourseAdd, on_delete=models.CASCADE) # One subitem relates to one add / One Course Add relates to Many order Subitems
 	extraprice = models.FloatField(default=0.0)
-	item = models.ForeignKey(OrderItem, on_delete=models.CASCADE) # One orden Subitem relates to ine Orden item / One order-Item relates to Many order-Subitems
+	item = models.ForeignKey(OrderItem, related_name="subitems", on_delete=models.CASCADE) # One orden Subitem relates to one Orden item / One order-Item relates to Many order-Subitems
 
 	def __str__(self):
-		return f"[{self.addcod.id}] (${self.extraprice}) Parent({item.productcod.name})"
+		return f"({self.id}) add[{self.addcod.name}] (${self.extraprice}) ParentItem({self.item.id})"
