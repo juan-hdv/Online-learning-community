@@ -93,7 +93,7 @@ def addToCart(request):
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "No id_courses"})
 	addsList = request.POST.getlist('courseAdds',None)
 
-	# Get course
+	# Get the selected course
 	try:
 		course = Course.objects.get(pk=courseId)
 	except KeyError:
@@ -102,19 +102,18 @@ def addToCart(request):
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Course do not exist."})
 
 	productQ = 1
-	# Get order from current user
 	usrCurrent = User.objects.get(username=request.user.username) # Get current user object
-	# Get active order for current User if exists or create a new
-	try:
-		order = Order.objects.filter(active=True).get(client=usrCurrent.id)
-	except Order.DoesNotExist:
-		order  = Order() 
-		order.save()
 
-	# Include product in Order
+	# Create a new order for current user
+	order  = Order() 
+	order.client = usrCurrent
+	order.price = 0
+	order.active = True
+	order.save()
+	
+	# # Create new order item
 	ordItem = OrderItem()
-	ordItem.productname = course.name
-	ordItem.productcod = course.id
+	ordItem.course = course
 	ordItem.quantity = productQ
 	ordItem.price = course.price
 	ordItem.order = order
@@ -127,23 +126,24 @@ def addToCart(request):
 		addId = int(params[0])
 		addExtraprice = float(params[1])
 		extrapricesAdds += addExtraprice
-
+		# Create new subitem of order item
 		ordSubitem = OrderSubitem()
 		ordSubitem.addcod = CourseAdd.objects.get(id=addId) 
 		ordSubitem.extraprice = addExtraprice
 		ordSubitem.item = ordItem
 		ordSubitem.save()
 
-	# Set order info
-	order.client = usrCurrent
+	# Update order info
 	order.price = (course.price + extrapricesAdds) * productQ 
-	order.active = True
 	order.save()
 
 	request.session["orderMessage"] = "Product added to the car."
 	return HttpResponseRedirect(reverse("index"))
 
 '''
+	# Get suer orders
+	try:
+		order = Order.objects.filter(active=True).get(client=usrCurrent.id)
 
 
 def showCart(request):
