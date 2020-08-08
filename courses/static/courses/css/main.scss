@@ -1,32 +1,31 @@
-
-// Small devices (mobiles, 575px and up)
-@media screen and (min-width: 575px) {
-	body { font-size: 14px; }
+// Extra small <576px (Mobiles)
+@media screen and (min-width: 320px) and (max-width: 575px) {
+	html, body { font-size: 11px !important;  }
 	.card-columns {	column-count: 1; }
 }
-
-// Medium devices (tablets, 768px and up)
-@media screen and (min-width: 768px) {  
-	body { font-size: 15px; }
+// Small ≥576px
+@media screen and (min-width: 576px) and (max-width: 768px) {  
+	html, body { font-size: 12px !important; }
 	.card-columns {	column-count: 1; }
 }
-
-// Large devices (desktops, 992px and up)
-@media screen and (min-width: 992px) { 
-	body { font-size: 16px; }
+// Medium ≥768px
+@media screen and (min-width: 769px) and (max-width: 992px) { 
+	html, body { font-size: 14px; }
 	.card-columns {	column-count: 2; }		
 }
-
-// Extra large devices (large desktops, 1200px and up)
-@media screen and (min-width: 1200px) { 
-	body { font-size: 17px; }
+// Large ≥992px
+@media screen and (min-width: 993px) and (max-width: 1400px) { 
+	// html, body { font-size: 16px; }
 	.card-columns {	column-count: 3; }
 }
-// Extra large devices (large desktops, 1200px and up)
-@media screen and (min-width: 1920px) { 
-	body { font-size: 17px; }
+// Extra large ≥1200px
+@media screen and (min-width: 1401px) and (max-width: 1920px) { 
 	.card-columns {	column-count: 4; }
 }
+@media screen and  (min-width: 1921px) { 
+	.card-columns {	column-count: 5; }
+}
+
 
 $BordersColor: #a5bcc9;
 
@@ -68,8 +67,7 @@ article {
 	display: block;
 	overflow-y: scroll;
 }
-
-table.addsTable {
+table {
 	margin:0;
 	padding:0;
 	border-collapse:collapse;
@@ -79,10 +77,12 @@ table.addsTable {
 		margin:0;
 		padding:0;
 	}
-	th, td {
-		padding: 3px 1em; // Top-Bottom Left-Right
-	}
-} 
+	.addsTable {
+		th, td {
+			padding: 3px 1em; // Top-Bottom Left-Right
+		}
+	} 
+}
 footer {
 	@extend .ColorFooter;
 	width: 100%;
@@ -133,7 +133,7 @@ small {
 	@extend .peter-river-700;
 	cursor: pointer;
 }
-.card {
+.card .w18{
 	width: 18rem;
 }
 .card-text {

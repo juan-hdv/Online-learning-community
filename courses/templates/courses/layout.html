@@ -7,7 +7,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" >
         <style media="all"></style>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <!-- Last version of Javascript, jquery and Bootstrap -->
+        <script src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>        
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>        
 
         <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
@@ -18,20 +23,32 @@
         <script src="{% static 'courses/js/main.js' %}"></script>
         <script type="text/babel" src="{% static 'courses/js/mainreact.jsx' %}"></script>
 
+<script>
+    window.addEventListener("resize", getResolution);
+    function getResolution() {
+        var viewportWidth  = document.documentElement.clientWidth;
+        document.querySelector("#MyResolution").innerHTML = `${viewportWidth}px`;
+    }
+</script>
+
     </head>
     <body>
         <header>
             <div class="MyContainer" rol="main">
                 <h2>Arts and Crafts Courses</h2>
             </div>
+            <div class="float-right mr-5 align-top">
+            [width:<span id="MyResolution">000</span>]
+            </div>
         </header>
-
         <div class="MyContainer">
-             {% if user.is_authenticated %}
-             <small>Welcome</small>&nbsp;<strong>{{user.first_name }}&nbsp;{{user.last_name }}</strong>&nbsp;
-             [ <a href="{% url 'logout' %}">Logout</a> ]
-             {% endif %}&nbsp;
-             [ <a href="#">Show Cart</a> ]&nbsp;
+            {% if user.is_authenticated %}
+            <small>Welcome</small>&nbsp;<strong>{{user.first_name }}&nbsp;{{user.last_name }}</strong>&nbsp;
+            [ <a href="{% url 'logout' %}">Logout</a> ]
+            {% endif %}&nbsp;
+            {% block cart %}
+            [ <a href="{% url 'showcart' %}">Show Cart</a> ]
+            {% endblock %}
 
             {% block body %}
             {% endblock %}
@@ -45,10 +62,5 @@
                 <h6>CS50W Capston - Juan Gabriel Mejía - 2020</h6>
             </div>
         </footer>
-        <!-- Last version of Javascript, jquery and Bootstrap -->
-        <script src="https://use.fontawesome.com/releases/v5.0.0/js/all.js"></script>
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     </body>
 </html>

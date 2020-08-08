@@ -68,7 +68,7 @@ class OrderItem(models.Model):
 
 # Order Subitem - Code of the ordered add for a Course
 class OrderSubitem(models.Model):
-	addcod = models.ForeignKey(CourseAdd, on_delete=models.CASCADE) # One subitem relates to one add / One Course Add relates to Many order Subitems
+	add = models.ForeignKey(CourseAdd, on_delete=models.CASCADE) # One subitem relates to one add / One Course Add relates to Many order Subitems
 	extraprice = models.FloatField(default=0.0)
 	item = models.ForeignKey(OrderItem, related_name="subitems", on_delete=models.CASCADE) # One orden Subitem relates to one Orden item / One order-Item relates to Many order-Subitems
 

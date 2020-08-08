@@ -78,17 +78,13 @@ def registerView(request):
 	else:
 		return render(request, "courses/register.html")
 
-# Get The current Uset Order Info 
-def getCurrentUserOrder(request):
-	pass
-
 # createOrder - A course and a lists of it's adds
 def addToCart(request):
 	if request.method != "POST":
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only POST request allowed"})
 
     # get form fields 
-	courseId = request.POST.get('id_course', None)
+	courseId = request.POST.get('idcourse', None)
 	if not courseId:
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "No id_courses"})
 	addsList = request.POST.getlist('courseAdds',None)
@@ -140,20 +136,14 @@ def addToCart(request):
 	request.session["orderMessage"] = "Product added to the car."
 	return HttpResponseRedirect(reverse("index"))
 
-'''
-	# Get suer orders
-	try:
-		order = Order.objects.filter(active=True).get(client=usrCurrent.id)
-
-
 def showCart(request):
-	# Get order from current user
-	order = getCurrentUserOrder (request)
-	if order:
-		message = "Empty cart!"
-	else:
-		message = ""
-
-	return render(request, "orders/showcart.html", {"order":order, "message":message, "msgType":"alert-info"})
-
-'''
+	if request.method != "GET":
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only GET request allowed"})
+	# Get client
+	try:
+		usrCurrent = User.objects.get(username=request.user.username) # Get current user object
+	except usrCurrent.DoesNotExist:
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "User do not exist."})
+	# Get active orders for current User
+	orders = Order.objects.filter(active=True,client=usrCurrent.id)
+	return render(request, "courses/cart.html", {"orders":orders})
