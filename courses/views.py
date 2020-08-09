@@ -11,7 +11,7 @@ from .models import User, Course, CourseCategory, CourseAdd, Order, OrderItem, O
 def handler404 (request, exception):
 	pagename = request.get_full_path().split("/").pop()
 	response = render(request, '404.html', {
-		"message":f"The resource you are looking for does not exist.",
+		"message": "The resource you are looking for does not exist.",
 		"pagename": pagename
 	})
 	response.status_code = 404
@@ -21,7 +21,8 @@ def index (request):
 	if request.user.is_authenticated:
 		return render(request, "courses/index.html", { 
 			"catalog": Course.objects.filter(active=True),
-			"categories": CourseCategory.objects.order_by('name')
+			"categories": CourseCategory.objects.order_by('name'),
+			"message": "Hellooooooooooo"
 		})
 	else:
 		return HttpResponseRedirect(reverse('login'))
@@ -32,10 +33,6 @@ def loginView(request):
 		password = request.POST["password"]
 		usr = authenticate(request, username=username, password=password)
 		if usr is not None:
-			'''
-			request.session["loginMessage"] = ''
-			request.session["orderMessage"] = ''
-			'''
 			login(request, usr)
 			return HttpResponseRedirect(reverse("index"))
 		else:
@@ -44,10 +41,6 @@ def loginView(request):
 		return render(request, "courses/login.html")
 
 def logoutView(request):
-	'''
-	request.session["loginMessage"] = ''
-	request.session["orderMessage"] = ''
-	'''
 	logout(request)
 	return HttpResponseRedirect(reverse("index"))
 
@@ -73,7 +66,6 @@ def registerView(request):
 		except IntegrityError:
 			return render(request, "courses/register.html", {"message": "Username already taken.", "msgType":"alert-warning"})
 		
-		request.session["loginMessage"] = "Registration succesfull. Please login."
 		return HttpResponseRedirect(reverse('index'))
 	else:
 		return render(request, "courses/register.html")
@@ -83,10 +75,11 @@ def addToCart(request):
 	if request.method != "POST":
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only POST request allowed"})
 
-    # get form fields 
+    # Get form fields 
 	courseId = request.POST.get('idcourse', None)
 	if not courseId:
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "No id_courses"})
+	# Get selectd Adds 
 	addsList = request.POST.getlist('courseAdds',None)
 
 	# Get the selected course
@@ -119,12 +112,17 @@ def addToCart(request):
 	extrapricesAdds = 0
 	for a in addsList:
 		params = a.split("-") # This field has this format: <id>-<extraprices>
-		addId = int(params[0])
 		addExtraprice = float(params[1])
+		addId = int(params[0])
 		extrapricesAdds += addExtraprice
 		# Create new subitem of order item
 		ordSubitem = OrderSubitem()
-		ordSubitem.addcod = CourseAdd.objects.get(id=addId) 
+		try:
+			ordSubitem.add = CourseAdd.objects.get(id=addId)
+		except KeyError:
+			return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "CourseAdd Key error."})
+		except CourseAdd.DoesNotExist:
+			return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "CourseAdd do not exist."})
 		ordSubitem.extraprice = addExtraprice
 		ordSubitem.item = ordItem
 		ordSubitem.save()
@@ -133,9 +131,27 @@ def addToCart(request):
 	order.price = (course.price + extrapricesAdds) * productQ 
 	order.save()
 
-	request.session["orderMessage"] = "Product added to the car."
 	return HttpResponseRedirect(reverse("index"))
 
+# deleteFromCart - Delete a current order id | Cascade delete Items adn Subitems
+def deleteFromCart(request):
+	if request.method != "POST":
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only POST request allowed"})
+
+    # get form fields 
+	orderId = request.POST.get('idorder', None)
+	if not orderId:
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "No id_order"})
+
+	# Delete order with idorder and cascade delete Items adn Subitems
+	try:
+		Order.objects.filter(pk=orderId).delete()
+	except IntegrityError:
+		return render(request, "courses/register.html", {"message": "Integrity error.", "msgType":"alert-warning"})
+
+	return HttpResponseRedirect(reverse("showcart"))
+
+# Show active orders from current user
 def showCart(request):
 	if request.method != "GET":
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only GET request allowed"})

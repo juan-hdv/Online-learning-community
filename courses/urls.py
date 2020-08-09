@@ -9,6 +9,7 @@ urlpatterns = [
 	path("logout", views.logoutView, name="logout"),
 	path("register", views.registerView, name="register"),
 	path("addtocart", views.addToCart, name="addtocart"),
+	path("deletefromcart", views.deleteFromCart, name="deletefromcart"),
 	path("showcart", views.showCart, name="showcart"),
 ]
 # For accesing applicaction media files 

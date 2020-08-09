@@ -31,51 +31,56 @@
 			<span class="text-info font-weight-bold">You have added {{ orders.count }} courses to your cart.</span>
 		 	{% endif %}
 			{% for o in orders %}
-			<div class="card my-3" id="order-{{o.id}}">
-				<div class="card-header">
-					<h6>Order # {{o.datetime|date:"Y-m"}}-{{o.id|stringformat:"03d"}}&nbsp;on {{o.datetime}}</h6>
-				</div>
-				<div class="card-body">
-					<div class="d-flex flex-row px-3 flex-wrap">
-						<div class="pr-3">
-							<img class="card-img-left img-fluid" src="/media/{{o.items.all.first.course.image}}" alt="{{o.items.all.first.course.name}}"><br>
-							<small class="text-muted">By {{o.items.all.first.course.provider.name}}</small>	
-						</div>
-						<div class=""> 
-							<!-- Order Item -->
-							<div class="d-flex flex-row justify-content-between">
-								<div class="px-2">
-									<h5 class="card-title">Course: {{o.items.all.first.course.name}}</h5>
-								</div>
-								<div class="px-2">
-									<h5 class="card-title">$ {{o.items.all.first.course.price|floatformat:2}}</h5>
-								</div>
-							</div>
-							<div class="d-flex flex-row">
-			    				<div class="px-2"><span class="text-info font-weight-bold">Selected adds:</span></div>
-			    			</div>
-			    			<!-- order subitems -->
-				    		{% for s in o.items.all.first.subitems.all %}
-				    		<div class="d-flex flex-row justify-content-between">
-					    		<div class="px-2">1&nbsp;{{s.add.name}}</div>
-					    		<div class="px-2">
-									{% if s.add.free %}
-									<span class="text-success">Free</span>
-									{% else %}
-									$ {{s.extraprice|floatformat:2 }}
-									{% endif %}
-					    		</div>
-				    		</div>
-					    	{% endfor %}
-				    	</div>
+			<form action="{% url 'deletefromcart' %}" method="post">
+				{% csrf_token %}
+				<input id="idorder-{{ o.id }}" name="idorder" value="{{ o.id }}" hidden>
+
+				<div class="card my-3" id="order-{{o.id}}">
+					<div class="card-header">
+						<h6>Order # {{o.datetime|date:"Y-m"}}-{{o.id|stringformat:"03d"}}&nbsp;on {{o.datetime}}</h6>
 					</div>
-		    	</div> <!-- card-body-->
-		    	<div class="card-footer">
-		    		<a href="#" class="btn btn-primary ml-4">Checkout</a>
-		    		<a href="#" class="btn btn-primary ml-4">Delete</a>
-		    		<strong class="ml-4">Total amount: $ {{o.price}}</strong>
-		    	</div>
-			</div> <!-- Card -->
+					<div class="card-body">
+						<div class="d-flex flex-row px-3 flex-wrap">
+							<div class="pr-3">
+								<img class="card-img-left img-fluid" src="/media/{{o.items.all.first.course.image}}" alt="{{o.items.all.first.course.name}}"><br>
+								<small class="text-muted">By {{o.items.all.first.course.provider.name}}</small>	
+							</div>
+							<div class=""> 
+								<!-- Order Item -->
+								<div class="d-flex flex-row justify-content-between">
+									<div class="px-2">
+										<h5 class="card-title">Course: {{o.items.all.first.course.name}}</h5>
+									</div>
+									<div class="px-2">
+										<h5 class="card-title">$ {{o.items.all.first.course.price|floatformat:2}}</h5>
+									</div>
+								</div>
+								<div class="d-flex flex-row">
+				    				<div class="px-2"><span class="text-info font-weight-bold">Selected adds:</span></div>
+				    			</div>
+				    			<!-- order subitems -->
+					    		{% for s in o.items.all.first.subitems.all %}
+					    		<div class="d-flex flex-row justify-content-between">
+						    		<div class="px-2">1&nbsp;{{s.add.name}}</div>
+						    		<div class="px-2">
+										{% if s.add.free %}
+										<span class="text-success">Free</span>
+										{% else %}
+										$ {{s.extraprice|floatformat:2 }}
+										{% endif %}
+						    		</div>
+					    		</div>
+						    	{% endfor %}
+					    	</div>
+						</div>
+			    	</div> <!-- card-body-->
+			    	<div class="card-footer">
+			    		<a href="#" class="btn btn-primary ml-4">Checkout</a>
+			    		<button href="{% url 'deletefromcart' %}" class="btn btn-primary ml-4" type="submit">Delete</button>
+			    		<strong class="ml-4">Total amount: $ {{o.price}}</strong>
+			    	</div>
+				</div> <!-- Card -->
+			</form> <!-- End form -->
 			{% endfor %}
 	    </div>
 	</section>
