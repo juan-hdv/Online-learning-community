@@ -43,11 +43,20 @@
                     <i class="fas fa-theater-masks fa-2x" alt="Crafts"></i>
                 </span>
                 <h2>&nbsp;&nbsp;Arts and Crafts Courses&nbsp;</h2>
-            </div>
 
-            <div class="float-right mr-5 align-top">
-            [width:<span id="MyResolution">000</span>]
-            </div>
+                {% if user.is_authenticated %}
+                <div class="float-right mr-5 mt-3">
+                    <a href="{% url 'showcart' %}" class="nounderline text-white"> 
+                        <i class="fas fa-shopping-cart align-middle"></i> ({{ user.orders.all.count }})
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="float-right mr-5  mt-3">
+                    [width:<span id="MyResolution">000</span>]
+                </div>
+           </div>
+
         </header>
         
         <div class="MyContainer">
@@ -59,7 +68,13 @@
             [ <a href="{% url 'showcart' %}">Show Cart</a> ]
             {% endblock %}
             {% endif %}
-            
+
+            {% if not user.is_authenticated %}
+            {% block loginmenu %}
+            [ <a href="{% url 'login' %}">Login</a> ]     
+            {% endblock %}
+            {% endif %}
+
             {% block body %}
             {% endblock %}
         </div>

@@ -147,6 +147,9 @@ small {
 .starsBox > button#clear {
   padding-left: 1em; }
 
+.nounderline {
+  text-decoration: none !important; }
+
 /**/
 /* General animations */
 @keyframes a_hidden {

@@ -21,13 +21,13 @@ def handler404 (request, exception):
 def index (request):
 	if request.user.is_authenticated:
 		usrCurrent = User.objects.get(username=request.user.username) # Get current user object
-		return render(request, "courses/index.html", { 
-			"catalog": Course.objects.filter(active=True),
-			"categories": CourseCategory.objects.order_by('name'),
-			"user": usrCurrent,
-		})
 	else:
-		return HttpResponseRedirect(reverse('login'))
+		usrCurrent = None
+	return render(request, "courses/index.html", { 
+		"catalog": Course.objects.filter(active=True),
+		"categories": CourseCategory.objects.order_by('name'),
+		"user": usrCurrent,
+	})
 
 def loginView(request):
 	if request.method == "POST":
@@ -73,6 +73,9 @@ def registerView(request):
 		return render(request, "courses/register.html")
 
 def courseReview (request, idcourse=None):
+	if not request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('login'))
+
 	usrCurrent = User.objects.get(username=request.user.username) # Get current user object
 	if request.method == "GET":
 		course = Course.objects.get(id=idcourse)
@@ -201,6 +204,10 @@ def deleteFromCart(request):
 def showCart(request):
 	if request.method != "GET":
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only GET request allowed"})
+
+	if not request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('login'))
+
 	# Get client
 	try:
 		usrCurrent = User.objects.get(username=request.user.username) # Get current user object
