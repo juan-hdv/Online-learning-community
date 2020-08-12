@@ -1,17 +1,22 @@
 {% extends 'courses/layout.html' %}
 {% load static %}
+{% load range %}
+{% load filter_by_user %}
 
 {% block body %}
-	<div align="center">
-		<h1>
-			Course Catalog
-		</h1>
-	</div>
+	<section class="row align-middle">
+		<div class="col-xs-4 col-sm-4 col-md-3 col-lg-2 col-xl-2">&nbsp;</div>
+		<div class="col-xs-4 col-sm-4 col-md-6 col-lg-8 col-xl-8 mb-1" align="center">
+    		<h1>Course Catalog</h1>
+		</div>
+		<div class="col-xs-4 col-sm-4 col-md-3 col-lg-2 col-xl-2">&nbsp;</div>
+	</section>
+
 	<section class="row">
 		<div align="">
 			<div class="card w18">
 				<div class="card-header">
-					<h5 class="card-title">Filter Categories</h5>
+					<h6 class="card-title">Filter by categories</h6>
 					{% if not categories %}
 					<h4 class="card-title">No categories to filter.</h4>
 					{% endif %}
@@ -41,6 +46,14 @@
 					{% endfor %}
 				</ul>
 				{% endif %}
+				<!-- filter by filter string -->
+				<div class="form-horizontal mt-2 p-2">
+					<div class="form-group" align="center">
+						<input id="filterString" class="form-control" type="text" value="" placeholder="Filter string">
+						<button id="filterButton" class="btn btn-primary mt-2">Filter</button>
+						<button id="clearButton" class="btn btn-secondary mt-2">Clear</button>
+					</div>
+				</div>
 			</div>			
 		</div>
 	    <div class="col-xs-8 col-sm-8 col-md-9 col-lg-10 col-xl-10">
@@ -61,22 +74,43 @@
 					 id="card-{{c.id}}"
 					 data-courseid="{{c.id}}" 
 				     data-categories="[{% for g in c.categories.all %}{{g.id}}{% if not forloop.last%},{% endif %}{% endfor %}]"
-				     data-selector="course-entry">
+				     data-selector="course-entry"
+				     data-content="{{c.name}} - {{c.description}}">
 					<img class="card-img-top img-fluid" src="/media/{{c.image}}" alt="{{c.name}}">
 					<div class="card-body">
-						<h5 class="card-title">{{c.name}}</h5>
-			    		<div style="height: 6rem">
-			    		{{c.description|truncatewords_html:15 }}
+						<h5 class="card-title">
+							{{c.name}}
+					    	<div><small class="text-muted">By&nbsp;{{c.provider}}</small></div>
+						</h5>
+			    		<div style="height: 7rem">
+			    			<div>
+			    				{{c.description|truncatewords_html:15 }}
+			    			</div>
+			    			<div class="mt-1">
+					    		<!-- Rating --> <!-- |filter_by_user:user -->
+								<a href="{% url 'coursereview' idcourse=c.id %}" class="text-info font-weight-bold">Rate</a>
+					    		{% if not c.reviews.all %}
+								&nbsp;( <small>No yet rated</small> )
+								{% else %}
+			                    &nbsp;( <span class="text-info">{%if c.avgRating|floatformat:1 != "0.0" %}{{ c.avgRating|floatformat:1 }}{% else %}0{% endif %}  /5</span> )&nbsp;
+			                    <span class="starsBox">
+			                    	<span> <!-- This additonal span to avoid click-event on <i> and avoid hover css effect over <i> -->
+			                    	{% for k in 0|range:c.get_avgRating_int %}
+			                        <i class="fa fa-star checked"></i> 
+			                        {% endfor %}
+			                    	{% for k in c.get_avgRating_int|range:5 reversed %}
+			                        <i class="fa fa-star"></i> 
+			                        {% endfor %}
+			                    	</span>
+			                    </span>
+								{% endif %}
+								<!-- End rating -->
+							</div>
 			    		</div>
-			    		
-				    	[{% for g in c.categories.all %}{{g.name}}{% if not forloop.last%},{% endif %}{% endfor %}]
-				    	<br><br>
-				    	
-				    	<small class="text-muted">By&nbsp;{{c.provider}}</small>
 					</div>
 					<div class="card-footer">
 			    	<!-- Button trigger modal -->
-			    	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ c.id }}">Details</button>
+			    	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ c.id }}">See more and enroll</button>
 			    	</div>
 				</div>
 

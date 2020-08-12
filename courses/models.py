@@ -23,7 +23,11 @@ class Course(models.Model):
 	price = models.FloatField(default=0.0)
 	maxFreeAdds = models.IntegerField(default=0)
 	provider = models.ForeignKey(CourseProvider, on_delete=models.PROTECT, default=1, blank=True) # One course have one provider / One provider is related with many courses
+	avgRating = models.FloatField(default=0.0)
 	active = models.BooleanField(default=True)
+
+	def get_avgRating_int(self):
+		return int(self.avgRating)
 
 	def __str__(self):
 		return f"[{self.name}] maxFreeAddsfree({self.maxFreeAdds}) (${self.price}) active[{self.active}]"
@@ -45,6 +49,21 @@ class CourseAdd(models.Model):
 
 	def __str__(self):
 		return f"[{self.name}] --{self.free}--(${self.extraprice}) active[{self.active}]"
+
+# Course Review
+class CourseReviews(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="reviews") # One review is related with only one course / One course could have many reviews
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews") # One review is related with only one User / One User could have mave many reviews
+    text = models.CharField(max_length=256,default='')
+    rating = models.IntegerField(default=0)
+
+    class Meta:
+    	constraints = [
+    		models.UniqueConstraint(fields=['course','user'], name='course-user-compositekey')
+    	]
+
+    def __str__(self):
+    	return f"{self.course.name}--{self.user.username} ({self.rating}) [{self.text}]"
 
 # Order
 class Order(models.Model):

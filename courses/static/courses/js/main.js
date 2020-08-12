@@ -1,18 +1,53 @@
-var csrftoken = "";
+// var csrftoken = "";
 
+/** General use functions 
+ */ 
+
+/** key Events
+*/
+function keyEvents (event) {
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the corresponding button element (event.currentTarget.selectorParam) with a click
+    document.getElementById(event.currentTarget.selectorParam).click();
+  }
+} // End keyEvents
 
 /** SET Intersection
 	Return the intersection between 2 sets
  */
 function setIntersection(set1, set2) {
-	return new Set(Array.from(set1).filter(x => set2.has(x)))	
+	return new Set(Array.from(set1).filter(x => set2.has(x)))
 }
+/** END General use functions  
+ */
 
+/** GetCheckedCategoriesList
+    @Returns Set of all of the checked categories in the checkbox list of courseCategories
+    		 except the "ALL" Category.
+ */
+ function GetCheckedCategoriesSet () {
+ 	// Make a SET of checked values (categories), except "ALL"
+	var filterCategories = new Set();
+	var checkboxes = document.querySelectorAll("input[name='courseCategories']:checked")
+	for (var i = 0; i < checkboxes.length; i++)
+		filterCategories.add(checkboxes[i].value);
+	return filterCategories;
+} // END GetCheckedCategoriesSet
+
+/** GetCourseCategoriesSet
+    @Returns Set of all of the course categories.
+ */
+function GetCourseCategoriesSet(courseObject) {
+	let courseCategorySet = new Set (courseObject.getAttribute('data-categories').replace(/[\[|\]]/g,"").split(","));
+	return courseCategorySet;
+} // GetCourseCategoriesSet
 
 /** Filter the list of courses by category
 	@category - Clicked categoty
  */
- function filterCourses(category) {
+ function filterCoursesByCategory(category) {
 	// Get category id clicked element
 	var id = category.getAttribute('data-categoryid');
  	// Manage clicked checkboxes according to "All Courses" (id === '0')
@@ -37,11 +72,7 @@ function setIntersection(set1, set2) {
 		}
  	}
  	// Make a SET of checked values (categories), except "ALL"
-	var filterCategories = new Set();
-	var checkboxes = document.querySelectorAll("input[name='courseCategories']:checked")
-	for (var i = 0; i < checkboxes.length; i++)
-		filterCategories.add(checkboxes[i].value);
-
+	var filterCategories = GetCheckedCategoriesSet();
 	// Set visible only courses with
 	document.querySelectorAll('[data-selector="course-entry"]').forEach ( course => {
 		if (id==0) 
@@ -50,16 +81,52 @@ function setIntersection(set1, set2) {
 				course.classList.remove("d-none");
 			else
 				course.classList.add("d-none");
-		else { // Show courses for a specific set of señected categories
-			let courseCategorySet = new Set (course.getAttribute('data-categories').replace(/[\[|\]]/g,"").split(","));
-			// If the is an intersection between course categories and selected categories, they must be displayed
-			if (setIntersection(courseCategorySet, filterCategories).size > 0)
-				course.classList.remove("d-none");
+		else { // Show courses for a specific set of selected categories
+			let courseCategorySet = GetCourseCategoriesSet(course);
+			// If there is an intersection between course categories and selected categories, they must be displayed
+			let canditateCourse = (setIntersection(courseCategorySet, filterCategories).size > 0);
+			if (canditateCourse)
+				course.classList.remove("d-none"); // Unhidde
 			else
-				course.classList.add("d-none");
+				course.classList.add("d-none"); // Hide
 		}
 	}); 
-} // End filterCourses
+} // End filterCoursesByCategory
+
+/** Filter the courses according to a filter string. The filter must apply over the category filter previously applied.
+	@filterstring - Words list to find in the course list.
+ */
+function filterCoursesByString(filterstring) {
+ 	// Make a SET of checked values (categories), except "ALL"
+	var filterCategories = GetCheckedCategoriesSet();	
+	// Set visible only courses filtered
+	document.querySelectorAll('[data-selector="course-entry"]').forEach ( course => {
+		// Get the Course Categories
+		var courseCategorySet = GetCourseCategoriesSet(course);
+		// If the is an intersection between the Course categories and selected categories, This is a candidate Course
+		var candidateCourse = (setIntersection(courseCategorySet, filterCategories).size > 0);
+		if (!filterstring) { // All courses for Selected Categories must shown
+			// If there is an intersection between course categories and selected categories, the course must be displayed
+			if (candidateCourse)
+				course.classList.remove("d-none"); // Unhidde
+			else
+				course.classList.add("d-none"); // Hide
+		} else { // The courses for teh selected categories must be filtered according to the filterstring
+			if (candidateCourse) {
+				// Get the complete contents of a course descriptión: NAME + DESCRIPTION
+				let content = course.getAttribute('data-content');
+				// Sanitize search string and split
+				let wordslist = filterstring.replace(/\[\],\.#\$%&\/\\@~!\?¿-_\+\^\*{}\|]/g,"").split (" ");
+				let matchedwords = wordslist.filter(word => content.includes(word));
+				// If any word is a substring of the content of the Course, I must be displayed
+				if (matchedwords && matchedwords.length > 0)
+					course.classList.remove("d-none"); // Unhidde
+				else
+					course.classList.add("d-none"); // Hidde
+			}
+		}
+	}); 
+} // filterCoursesByString
 
 function getAddsInfo (courseid) {
 	// Get complete adds list for course
@@ -123,22 +190,74 @@ document.addEventListener('DOMContentLoaded', load);
  * - Set "change"  event handlers for ...
  */
 function load () {
-
 	/** Click event handler for click card-link Category link
 	  */
 	document.querySelectorAll("input[name='courseCategories']").forEach ( category => {
 		category.addEventListener('click', event => { 
-			filterCourses(category) 
+			filterCoursesByCategory(category) 
 		});
 	}); // End .plusButton'.onclick
 
-	/** Click event handler for course Adds Changes
-		Update Adds limits and price in modal dialog */
+	/** Click event handler for button search (filter)
+      */
 	document.querySelectorAll("input[name='courseAdds']").forEach ( add => {
 		add.addEventListener('change', event => { 
 			checkOrderAdds(add.getAttribute('data-courseid'));// Check adds for course
 		});
 	}); // End course Adds Changes
 
-	csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+	/** Click event handler for filter by string click or <Enter> Key
+ 	*/
+	var stringInputField = document.querySelector("#filterString");
+	if (typeof stringInputField !== 'undefined' && stringInputField != null) {
+		// Add a key event to input field
+	    stringInputField.addEventListener("keyup", keyEvents, false);
+	    stringInputField.selectorParam = 'filterButton';
+	    // Click event for button
+		document.querySelector("#filterButton").addEventListener('click', event => {
+	  		filterCoursesByString(stringInputField.value);
+		}); // End #filterButton
+
+		/** Click event handler for clear filter by string
+	 	*/
+		document.querySelector("#clearButton").addEventListener('click', event => {
+			stringInputField.value='';
+	  		filterCoursesByString("");
+		}); // End #filterButton
+	}
+
+	/** RATINGS **/
+	function setRatingStar(starRating) {
+		starRating.forEach ( item => {
+			if (parseInt(item.parentNode.querySelector('input#userrating').value) >= parseInt(item.getAttribute('data-rating')))
+			  item.classList.add('checked');
+			else
+			  item.classList.remove('checked');
+		});
+	} // End setRatingStar
+
+	/**	Select Rating
+	 */
+	document.querySelectorAll (".starsBox > i").forEach ( item => {
+		item.addEventListener('click', event => {
+			item.parentNode.querySelector('input#userrating').value = item.getAttribute('data-rating');
+			// Set rating 
+			setRatingStar(item.parentNode.querySelectorAll (".starsBox > i"));
+		}); // End click starsBox>i
+	});
+
+	/**	Clear Rating
+	 */
+	document.querySelectorAll('.starsBox > button#clear').forEach ( item => {
+		item.addEventListener('click', event => {
+			item.parentNode.querySelector('input#userrating').value = 0;
+		  	item.parentNode.querySelectorAll (".starsBox > i").forEach ( item => {
+				item.classList.remove('checked');
+			});
+		}); // End click starsBox>i
+    });
+	// Update all stars
+	setRatingStar(document.querySelectorAll (".starsBox > i"));
+
+	// csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
 } // End load

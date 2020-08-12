@@ -134,7 +134,7 @@ small {
 	cursor: pointer;
 }
 .card .w18{
-	width: 18rem;
+	width: 18rem !important;
 }
 .card-text {
 	height: 4rem;
@@ -151,6 +151,26 @@ small {
 	font-size: 110%;
 	font-weight: bold;
 }
+
+/** Rating styles **/
+.starsBox  {
+	#getUserRating {
+		display: inline; 
+	}
+	> i:hover {
+		cursor: pointer;
+		font-size: 18px; 
+	}
+	i.checked {
+		font-size: 18px;
+		color: #28a745; 
+	}
+	> button#clear {
+		padding-left: 1em; 
+	}
+}
+/**/
+
 /* General animations */
 @keyframes a_hidden {
   0%{

@@ -120,7 +120,7 @@ small {
   cursor: pointer; }
 
 .card .w18 {
-  width: 18rem; }
+  width: 18rem !important; }
 
 .card-text {
   height: 4rem; }
@@ -135,6 +135,19 @@ small {
   font-size: 110%;
   font-weight: bold; }
 
+/** Rating styles **/
+.starsBox #getUserRating {
+  display: inline; }
+.starsBox > i:hover {
+  cursor: pointer;
+  font-size: 18px; }
+.starsBox i.checked {
+  font-size: 18px;
+  color: #28a745; }
+.starsBox > button#clear {
+  padding-left: 1em; }
+
+/**/
 /* General animations */
 @keyframes a_hidden {
   0% {

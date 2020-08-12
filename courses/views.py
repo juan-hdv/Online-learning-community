@@ -1,12 +1,13 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.db import IntegrityError, Error
+from django.db.models import Avg
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 import json
 
-from .models import User, Course, CourseCategory, CourseAdd, Order, OrderItem, OrderSubitem
+from .models import User, Course, CourseCategory, CourseAdd, CourseReviews, Order, OrderItem, OrderSubitem
 
 def handler404 (request, exception):
 	pagename = request.get_full_path().split("/").pop()
@@ -19,10 +20,11 @@ def handler404 (request, exception):
 
 def index (request):
 	if request.user.is_authenticated:
+		usrCurrent = User.objects.get(username=request.user.username) # Get current user object
 		return render(request, "courses/index.html", { 
 			"catalog": Course.objects.filter(active=True),
 			"categories": CourseCategory.objects.order_by('name'),
-			"message": "Hellooooooooooo"
+			"user": usrCurrent,
 		})
 	else:
 		return HttpResponseRedirect(reverse('login'))
@@ -69,6 +71,50 @@ def registerView(request):
 		return HttpResponseRedirect(reverse('index'))
 	else:
 		return render(request, "courses/register.html")
+
+def courseReview (request, idcourse=None):
+	usrCurrent = User.objects.get(username=request.user.username) # Get current user object
+	if request.method == "GET":
+		course = Course.objects.get(id=idcourse)
+		# Get review from user for the current course
+		ur = CourseReviews.objects.filter(course=course,user=usrCurrent)
+		if ur.exists():
+			ur = ur.first()
+			userReview = {'text': ur.text, 'rating': ur.rating }
+		else:
+			userReview = {'text':'', 'rating':0}
+		courseReviews = CourseReviews.objects.exclude(user=usrCurrent).filter(course=course)
+		return render(request, "courses/review.html", {"course": course, "userReview": userReview, "courseReviews": courseReviews})
+	elif request.method == "POST":
+	    # Get form fields 
+		courseId = request.POST.get('idcourse', None)
+		course = Course.objects.get(id=courseId)
+		if not courseId:
+			return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "No id_courses"})
+		userRating = request.POST.get('userrating', None)
+		userReview = request.POST.get('userreview', None)
+		action = request.POST.get ('buttonAction', None)
+
+		if action in "update":
+			rating, created = CourseReviews.objects.update_or_create(
+				course=course, user=usrCurrent, 
+				defaults={'rating': userRating, 'text': userReview}
+			)
+		elif action in "delete":
+			# Delete rating for course and user
+			try:
+				CourseReviews.objects.filter(course=course, user=usrCurrent).delete()
+			except IntegrityError:
+				return render(request, "courses/register.html", {"message": "Integrity error.", "msgType":"alert-warning"})
+		else:
+			return render(request, "courses/error.html", {"msgType": "alert-danger", "message": f'Invalid operation - Unknown botton action: {action}'})
+		# Recalculate course average rating
+		course.avgRating = float(CourseReviews.objects.filter(course=course).aggregate(Avg('rating'))['rating__avg'])
+		course.save()
+		return HttpResponseRedirect(reverse("index"))
+	else:
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": 'Bad request!'})
+
 
 # createOrder - A course and a lists of it's adds
 def addToCart(request):
