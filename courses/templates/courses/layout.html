@@ -57,7 +57,7 @@
                 {% if user.is_authenticated %}
                 <div class="float-right mr-5 mt-3">
                     <a href="{% url 'showcart' %}" class="nounderline text-white"> 
-                        <i class="fas fa-shopping-cart align-middle"></i> ({{ user.orders.all.count }})
+                        <i class="fas fa-shopping-cart align-middle"></i> ({{ user.get_activeOrders.count }})
                     </a>
                 </div>
                 {% endif %}

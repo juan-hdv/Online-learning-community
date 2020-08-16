@@ -4,7 +4,11 @@ from django.db import models
 
 
 class User(AbstractUser):
-	# More fields?
+	
+	# get set of active orders (those not payed yet)
+	def get_activeOrders(self):
+		return self.orders.filter(active=True)
+
 	def __str__(self):
 		return f"{self.username} ({self.email})"
 
@@ -59,6 +63,7 @@ class CourseReviews(models.Model):
     text = models.CharField(max_length=256,default='')
     rating = models.IntegerField(default=0)
 
+    # Add a contraint for a composite key (course-user)
     class Meta:
     	constraints = [
     		models.UniqueConstraint(fields=['course','user'], name='course-user-compositekey')
@@ -74,6 +79,7 @@ class Order(models.Model):
 	price = models.FloatField(default=0.0)
 	active = models.BooleanField(default=True) # An inactive order is one already payed and served 
 
+	# Get a constructed order code including date
 	def get_orderCode (self):
 		return "{date}-{id:03d}".format(date=self.datetime.strftime("%Y-%m"), id=self.id)
 
@@ -87,7 +93,7 @@ class OrderItem(models.Model):
 	price = models.FloatField(default=0.0) # Total order due amount
 	order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE) # One Order relates to Many order-Items / On items relates to One order
 
-	# Get the proces of subitems, total number of subitems, and number of free subitems
+	# Get subitems total price, total number of subitems, and number of free subitems
 	def get_subitemsPrice (self):
 		response = self.subitems.all().aggregate(
 				extraprices=Sum('extraprice',filter=Q(add__free=False)), 

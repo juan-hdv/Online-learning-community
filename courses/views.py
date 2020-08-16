@@ -297,8 +297,19 @@ def capturePaypalOrder(request):
 	response = paypal_captureOrder (url, token)
 	if response.status_code != 201: # Created
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": f"HTTP Error {response.status_code} <creating order>. Please try later."})
-
 	jsonResponse = response.json()
+
+	# If user authorized payment, the order must be marked as processed (INACTIVE)
+	if jsonResponse['status'] == "COMPLETED":
+		orderid = paypalOrder['details']['orderid']
+		try:
+			order = Order.objects.get(id=orderid) # Get clicked order
+		except order.DoesNotExist:
+			return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Order do not exist."})
+		# Mark Order as processed
+		order.active = False
+		order.save()
+
 	request.session['paypalOrder']['response'] = jsonResponse
 	return JsonResponse(jsonResponse)
 
