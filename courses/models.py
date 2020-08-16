@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
+from django.db.models import Q, Sum, Count
 from django.db import models
+
 
 class User(AbstractUser):
 	# More fields?
@@ -72,6 +74,9 @@ class Order(models.Model):
 	price = models.FloatField(default=0.0)
 	active = models.BooleanField(default=True) # An inactive order is one already payed and served 
 
+	def get_orderCode (self):
+		return "{date}-{id:03d}".format(date=self.datetime.strftime("%Y-%m"), id=self.id)
+
 	def __str__(self):
 		return f"({self.id}) Dt[{self.datetime}] {self.client.username} {self.price} active[{self.active}] nItems({self.items.count()})"
 
@@ -81,7 +86,20 @@ class OrderItem(models.Model):
 	quantity = models.IntegerField(default=0)
 	price = models.FloatField(default=0.0) # Total order due amount
 	order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE) # One Order relates to Many order-Items / On items relates to One order
-	
+
+	# Get the proces of subitems, total number of subitems, and number of free subitems
+	def get_subitemsPrice (self):
+		response = self.subitems.all().aggregate(
+				extraprices=Sum('extraprice',filter=Q(add__free=False)), 
+				numcharged=Count('add',filter=Q(add__free=False)), 
+				numfree=Count('add',filter=Q(add__free=True))
+			)
+		return {
+				'extraprices': response["extraprices"] or 0,
+				'numcharged':response["numcharged"], 
+				'numfree':response["numfree"]
+			}
+
 	def __str__(self):
 		return f"({self.id}) Course[{self.course.name}] Q({self.quantity}) (${self.price}) ParentOrder({self.order.id}) nSubitems({self.subitems.count()})"
 

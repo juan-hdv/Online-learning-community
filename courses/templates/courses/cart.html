@@ -30,6 +30,7 @@
 			{% else %}	 	
 			<span class="text-info font-weight-bold">You have added {{ orders.count }} courses to your cart.</span>
 		 	{% endif %}
+
 			{% for o in orders %}
 			<form action="{% url 'deletefromcart' %}" method="post">
 				{% csrf_token %}
@@ -37,7 +38,7 @@
 
 				<div class="card my-3" id="order-{{o.id}}">
 					<div class="card-header">
-						<h6>Order # {{o.datetime|date:"Y-m"}}-{{o.id|stringformat:"03d"}}&nbsp;on {{o.datetime}}</h6>
+						<h6>Order # {{o.get_orderCode}}&nbsp;on {{o.datetime}}</h6>
 					</div>
 					<div class="card-body">
 						<div class="d-flex flex-row px-3 flex-wrap">
@@ -75,12 +76,166 @@
 						</div>
 			    	</div> <!-- card-body-->
 			    	<div class="card-footer">
-			    		<a href="#" class="btn btn-primary ml-4">Checkout</a>
-			    		<button href="{% url 'deletefromcart' %}" class="btn btn-primary ml-4" type="submit">Delete</button>
-			    		<strong class="ml-4">Total amount: $ {{o.price}}</strong>
+			    		<button href="{% url 'deletefromcart' %}" class="btn btn-secondary ml-4" type="submit">Delete</button>
+				    	<!-- Button trigger modal -->
+				    	<button type="button" class="btn btn-primary ml-4" data-toggle="modal" data-target="#modal-{{ o.id }}">Checkout</button>
+			    		<strong><span class="ml-5 display-5">Total amount: $ {{o.price}}</span></strong>
 			    	</div>
 				</div> <!-- Card -->
-			</form> <!-- End form -->
+			</form> <!-- End form ORDERS -->
+
+			<!-- PAYMENT Form -->
+			<form action="{% url 'dopayment' %}" method="post">
+			{% csrf_token %}
+
+			<!-- Modal -->
+			<div class="modal fade" id="modal-{{ o.id }}" tabindex="-1" role="dialog" aria-labelledby="modal-{{ o.id }}-Tittle" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title">Pay order # {{o.get_orderCode}}</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div> <!-- modal-header -->
+						<div class="modal-body">
+							<!-- Course INFO -->
+							<div class="form-group w18">
+								<div class="card">
+									<div class="card-header">
+										<h4>{{ o.items.all.first.course.name }} <small>by {{o.items.all.first.course.provider.name}}</small></h4>
+									</div>
+									<div class="card-body">
+										<div class="d-flex flex-row justify-content-between">
+											<div class="px-2">
+												1 Course price</div>
+											<div class="px-2 font-weight-bold">
+												${{o.items.all.first.course.price}}
+											</div>
+										</div>
+										<div class="d-flex flex-row justify-content-between">
+											<div class="px-2">
+												{{o.items.all.first.get_subitemsPrice.numcharged}}&nbsp;Charged adds price</div>
+											<div class="px-2 font-weight-bold">
+												${{o.items.all.first.get_subitemsPrice.extraprices}}
+											</div>
+										</div>
+										<div class="d-flex flex-row justify-content-between">	
+											<div class="px-2">
+												{{o.items.all.first.get_subitemsPrice.numfree}}&nbsp;Free adds
+											</div>
+											<div class="px-2 font-weight-bold">
+												- o -
+											</div>
+										</div>
+									</div>
+									<div class="card-footer">
+										<div class="d-flex flex-row justify-content-between">
+											<div class="px-2 font-weight-bold">Total amount to pay</div>
+											<div class="px-2 font-weight-bold">${{o.price}}</div>
+										</div>
+									</div>
+								</div>	
+								<input id="orderid-{{ o.id }}" name="orderid" value="{{ o.id }}" hidden>
+							</div>
+						</div> <!-- modal-body -->
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+							<div id="paypal-button-container-{{ o.id }}"></div>
+					        <script>
+								/**
+								  Paypal front 
+								  from: https://www.paypal.com/apex/product-profile/ordersv2/approveOrder
+
+								  WARNING - READ THIS ALSO: 
+								  https://developer.paypal.com/docs/checkout/reference/upgrade-integration/#6-fix-deprecations
+								  as for the return and cancel urls
+								  */
+								var LOCAL_SERVER = "http://127.0.0.1:8000";
+
+								paypal.Buttons({
+								    env: 'sandbox', /* sandbox | production */
+								    style: {
+								                layout: 'horizontal',   // horizontal | vertical 
+								                size:   'responsive',   /* medium | large | responsive*/
+								                shape:  'pill',         /* pill | rect*/
+								                color:  'gold',         /* gold | blue | silver | black*/
+								                fundingicons: false,    /* true | false */
+								                tagline: false          /* true | false */
+								            }, 
+								 
+								    /* createOrder() is called when the button is clicked */
+								    createOrder: function() {
+								          /* Set up a url on your server to create the order */
+								          var CREATE_URL = '/dopayment';
+								          /* Make a call to your server to set up the payment */
+								          return fetch(CREATE_URL, {
+								            method: 'POST',
+								            headers: { 
+								              'X-CSRFToken': csrftoken, // Indispensable!!!!!
+								              'Accept': "application/json",
+								              'Content-Type': "application/json",
+								              'accept-language': "en_US",
+								              'dataType': 'json',
+								            },
+								            body: JSON.stringify ({
+								              orderid: "{{ o.id }}",
+								            }),
+								          }).then(function(res) {
+								            return res.json();
+								          }).then(function(data) {
+								            // return data.id
+								            return data.id;
+								          }).catch(function(error) {
+								            console.log("Error createOrder", error);
+								          });
+								     },
+								  
+								    /* onApprove() is called when the buyer approves the payment */
+								    onApprove: function(data, actions) {
+								         /* Set up a url on your server to execute the payment */
+								         var EXECUTE_URL = '/capturepayment';
+								         var COMPLETE_URL = '/showpayment';
+								 
+								        /* Set up the data you need to pass to your server */
+								 
+								        /* Make a call to your server to execute the payment */
+								        return fetch(EXECUTE_URL, {
+								            method: 'POST',
+								            headers: { 
+								              'X-CSRFToken': csrftoken, // Indispensable!!!!!
+								            },
+								            body: JSON.stringify ({
+								              orderID: data.id
+								            }),
+								        }).then(function(res) {
+								          return res.json();
+								        }).then(function(details) {
+								          // alert ("Senquiu: "+details.payer.name.surname);
+								          actions.redirect(LOCAL_SERVER+COMPLETE_URL);
+								          return true;
+								        }).catch(function(error) {
+								          console.log("Error onApprove", error);
+								        });
+								  },
+								  onCancel: function(data, actions) {
+								    var CANCEL_URL = '/cancelpayment';
+								    actions.redirect(LOCAL_SERVER+CANCEL_URL);
+								    return false;
+								  },
+								  onError: function() {
+								    alert ("An error has occurred. Please try again.");
+								    return false;
+								  }
+								}).render('#paypal-button-container-{{ o.id }}');
+					        </script>
+						</div>
+					</div> <!-- modal-content -->
+				</div> <!-- modal-dialog -->
+			</div>
+			<!-- END Modal -->
+			</form>								
 			{% endfor %}
 	    </div>
 	</section>

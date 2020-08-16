@@ -1,0 +1,124 @@
+{% extends 'courses/layout.html' %}
+{% load static %}
+
+{% block extramenu %}
+[ <a href="{% url 'index' %}">Course catalog</a> ]
+{% endblock %}
+
+{% block body %}
+	<section class="m-3 p-3">
+		<h1 class="text-success">Thanks for your payment</h1>
+		<div id="message_zone" class="px-3 pt-2">
+		    <div class="alert alert-success" role="alert">
+		    	<span class="font-weight-bold">
+				 <p>Your payment has been completed and we have sent you a receipt for your purchase by email. </p>
+				 <p>To view the details of the transaction, log in to your PayPal account.</p>
+				</span>
+			</div>
+		</div>
+		<!-- Button trigger modal -->
+		<button type="button" class="btn btn-primary ml-4" data-toggle="modal" data-target="#modal-payment">See details</button>
+		<br><br>
+		[&nbsp;<a href="{% url 'index' %}">Back to Home</a>&nbsp;]
+	</section>
+	<section class="row">
+		<!-- Modal Payment Successfull -->
+		<div class="modal fade" id="modal-payment" tabindex="-1" role="dialog" aria-labelledby="modal-{{ o.id }}-Tittle" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3 class="modal-title">Payment successful</h3>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div> <!-- modal-header -->
+					<div class="modal-body">
+						<!-- Course INFO -->
+						<div class="form-group w18">
+							<div class="card">
+								<div class="card-header">
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2">
+											 <small>{% now "jS F Y H:i" %}</small>
+										</div>
+									</div>
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2">
+											Transaction Status:
+										</div>
+										<div class="px-2 font-weight-bold">
+											{{payment.response.status}}
+										</div>
+									</div>
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2">
+											Product:
+										</div>
+										<div class="px-2 font-weight-bold">
+											[{{payment.details.referencecode}}] {{payment.details.referencename}}
+										</div>
+									</div>
+									<br>
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2">
+											 <p class="font-weight-bold">Your payment has been completed succesfully. We have sent you a receipt for your purchase by email.
+
+											 To view the details of the transaction, log in to your PayPal account.</p>
+											 <hr>
+										</div>
+									</div>
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2 font-weight-bold">Total</div>
+										<div class="px-2 font-weight-bold"> 
+											{{payment.response.purchase_units.0..amount.currency_code}}
+											&nbsp;$ {{payment.response.purchase_units.0.amount.value }}
+										</div>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2 w-50">
+											Order ID:</div>
+										<div class="px-2 font-weight-bold">
+											{{payment.response.id}}
+										</div>
+									</div>
+									<div class="d-flex flex-row justify-content-between">
+										<div class="px-2 w-50">
+											Payment will be reflected on your credit card statement as:
+										</div>
+										<div class="px-2 font-weight-bold">
+											{{payment.response.purchase_units.0.soft_descriptor}}
+										</div>
+									</div>
+									<div class="d-flex flex-row justify-content-between">	
+										<div class="px-2">
+											Address:
+										<div class="font-weight-bold pl-4">
+											{{payment.response.purchase_units.0.shipping.name.fullname}}<br>
+											{{payment.response.purchase_units.0.shipping.address.address_line_1}}<br>
+											{{payment.response.purchase_units.0.shipping.address.address_line_2}}<br>
+											{{payment.response.purchase_units.0.shipping.address.admin_area_1}}<br>
+											{{payment.response.purchase_units.0.shipping.address.admin_area_2}}<br>
+											Postal Code : {{payment.response.purchase_units.0.shipping.address.postal_code}}<br>
+											Country Code: {{payment.response.purchase_units.0.shipping.address.country_code}}<br>
+										</div>
+									</div>
+								</div>
+							</div>	
+						</div>
+					</div> <!-- modal-body -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+					</div>
+				</div> <!-- modal-content -->
+			</div> <!-- modal-dialog -->
+		</div>
+		<!-- END Modal -->
+	</section>
+
+	<script>
+		$('#modal-payment').modal();
+	</script>
+
+{% endblock %}

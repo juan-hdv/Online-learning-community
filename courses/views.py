@@ -1,14 +1,19 @@
+import json
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
+from django.conf import settings
 from django.db import IntegrityError, Error
 from django.db.models import Avg
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
-import json
 
 from .models import User, Course, CourseCategory, CourseAdd, CourseReviews, Order, OrderItem, OrderSubitem
+from .utils import paypal_getToken, paypal_createOrder, paypal_captureOrder, paypal_showDetailsOrder
 
+''' 
+ **	ERROR HANDLERS
+''' 
 def handler404 (request, exception):
 	pagename = request.get_full_path().split("/").pop()
 	response = render(request, '404.html', {
@@ -18,6 +23,9 @@ def handler404 (request, exception):
 	response.status_code = 404
 	return response
 
+''' 
+ **	INDEX
+''' 
 def index (request):
 	if request.user.is_authenticated:
 		usrCurrent = User.objects.get(username=request.user.username) # Get current user object
@@ -29,6 +37,9 @@ def index (request):
 		"user": usrCurrent,
 	})
 
+''' 
+ **	USERS SIGNING
+''' 
 def loginView(request):
 	if request.method == "POST":
 		username = request.POST["username"]
@@ -72,6 +83,9 @@ def registerView(request):
 	else:
 		return render(request, "courses/register.html")
 
+''' 
+ **	COURSES
+''' 
 def courseReview (request, idcourse=None):
 	if not request.user.is_authenticated:
 		return HttpResponseRedirect(reverse('login'))
@@ -118,6 +132,9 @@ def courseReview (request, idcourse=None):
 	else:
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": 'Bad request!'})
 
+''' 
+ **	ORDERS (SHOPING CART)
+''' 
 
 # createOrder - A course and a lists of it's adds
 def addToCart(request):
@@ -200,7 +217,7 @@ def deleteFromCart(request):
 
 	return HttpResponseRedirect(reverse("showcart"))
 
-# Show active orders from current user
+# URL showcart -- Show active orders from current user
 def showCart(request):
 	if request.method != "GET":
 		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Only GET request allowed"})
@@ -216,3 +233,102 @@ def showCart(request):
 	# Get active orders for current User
 	orders = Order.objects.filter(active=True,client=usrCurrent.id)
 	return render(request, "courses/cart.html", {"orders":orders})
+
+''' 
+ **	CHECKOUT
+''' 
+# URL dopayment
+def createPaypalOrder(request):
+	if not (request.is_ajax and request.method == "POST"):
+		return render(request, "courses/error.html", {"message": "Operation not allowed."})
+
+	if not request.user.is_authenticated:
+		return HttpResponseRedirect(reverse('login'))
+
+	# Get clicked order-id
+    # It's an Ajax request and data comes in "request.body" not in "request.POST"!!!!
+	data = json.loads(request.body)
+	orderid = data['orderid']
+	try:
+		order = Order.objects.get(id=orderid) # Get clicked order
+	except order.DoesNotExist:
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Order do not exist."})
+
+	# Get the paypal Token
+	response = paypal_getToken(settings.PAYPAL_URLTOKEN)
+	if response.status_code != 200:
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": f"HTTP Error {response.status_code} <getting token>."})
+
+	# Get and set Order Details
+	paypalOrder = {
+		'token': response.json()['access_token'],
+		'details': {
+			'orderid': f"{order.id}",
+			'referencename': order.items.all().first().course.name,
+			'referencecode': f"ACC-{order.items.all().first().course.id}",
+			'totalamount': f"{order.price}",
+		},
+		'response':'', # paypal_getToken do not returns a response 'text'
+	}
+	# Create paypal Order => 201 Created
+	response = paypal_createOrder (settings.PAYPAL_URLORDER, paypalOrder['token'], paypalOrder['details'])
+	if response.status_code != 201: # Created
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": f"HTTP Error {response.status_code} <creating order>. Please try later."})		
+
+	jsonResponse = response.json()
+	request.session['paypalOrder'] = paypalOrder
+	request.session['paypalOrder']['response'] = jsonResponse
+	return JsonResponse(jsonResponse)
+
+# URL capturepayment
+def capturePaypalOrder(request):
+	if not (request.is_ajax and request.method == "POST"):
+		return render(request, "courses/error.html", {"message": "Operation not allowed."})
+
+	# Get current token
+	paypalOrder = request.session.get("paypalOrder",False)
+	if not paypalOrder: 
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": "Payment failed. Nonexistent <token> or <order>.  Please restart your payment."})
+
+	token = paypalOrder['token']
+	# Personalize URL with paypal order ID
+	url = next((item for item in paypalOrder['response']['links'] if item['rel'] == 'capture'), None)["href"]
+	# CAPTURE funds of paypal order => 201 Created
+	response = paypal_captureOrder (url, token)
+	if response.status_code != 201: # Created
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": f"HTTP Error {response.status_code} <creating order>. Please try later."})
+
+	jsonResponse = response.json()
+	request.session['paypalOrder']['response'] = jsonResponse
+	return JsonResponse(jsonResponse)
+
+# URL showpayment
+def showPaypalPayment(request):
+	# Get current token
+	paypalOrder = request.session.get("paypalOrder",False)
+	if not paypalOrder: 
+		return HttpResponseRedirect(reverse("index"))
+
+	token = paypalOrder['token']
+	# Personalize URL with paypal order ID
+	url = settings.PAYPAL_URLSHOW.replace('<ORDERID>',paypalOrder['response']['id'])
+	# Show paypal order details => 200 Ok
+	response = paypal_showDetailsOrder (url, token)
+	if response.status_code != 200: # Ok
+		return render(request, "courses/error.html", {"msgType": "alert-danger", "message": f"HTTP Error {response.status_code} <creating order>. Please try later."})
+
+	jsonResponse = response.json()
+	request.session['paypalOrder']['response'] = jsonResponse
+	paypalOrder = request.session['paypalOrder']
+
+	# Delete session variables
+	del request.session['paypalOrder']
+	request.session.modified = True
+	return render(request, "courses/showpayment.html", {'payment':paypalOrder})
+
+# URL cancelpayment
+def cancelPaypalPayment(request):
+	return render(request, "courses/information.html", {"msgType": "alert-success", "message": f"Your payment has been successfully canceled. No charges have been applied."})
+
+
+

@@ -1,5 +1,3 @@
-// var csrftoken = "";
-
 /** General use functions 
  */ 
 
@@ -259,5 +257,6 @@ function load () {
 	// Update all stars
 	setRatingStar(document.querySelectorAll (".starsBox > i"));
 
-	// csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+	csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+	
 } // End load

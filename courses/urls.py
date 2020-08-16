@@ -13,7 +13,10 @@ urlpatterns = [
 	path("showcart", views.showCart, name="showcart"),
 	path('coursereview/<int:idcourse>', views.courseReview, name="coursereview"),
 	path('coursereview', views.courseReview, name="coursereview"),
-	# re_path(r'^coursereview/(?P<idcourse>\d+)?/', views.courseReview, name="coursereview"),
+	path('dopayment', views.createPaypalOrder, name="dopayment"),
+	path('capturepayment', views.capturePaypalOrder, name="capturepayment"),
+	path('showpayment', views.showPaypalPayment, name="showpayment"),
+	path('cancelpayment', views.cancelPaypalPayment, name="cancelpayment"),
 ]
 # For accesing applicaction media files 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

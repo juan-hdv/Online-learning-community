@@ -1,7 +1,6 @@
 {% extends 'courses/layout.html' %}
 {% load static %}
 {% load range %}
-{% load filter_by_user %}
 
 {% block body %}
 	<section class="row align-middle">
@@ -26,7 +25,7 @@
 				<ul class="list-group list-group-flush">
 					<li  class="list-group-item">
 						<label>
-							<input type="checkbox" class="display-5" id="card-link-0" name="courseCategories" 
+							<input type="checkbox" class="display-6" id="card-link-0" name="courseCategories" 
 						    data-categoryid="0" 
 							value="0"
 						    checked>
@@ -36,7 +35,7 @@
 					{% for c in categories %}
 					<li  class="list-group-item">
 						<label>
-							<input type="checkbox" class="display-5" id="card-link-{{c.id}}" name="courseCategories" 
+							<input type="checkbox" class="display-6" id="card-link-{{c.id}}" name="courseCategories" 
 						    data-categoryid="{{c.id}}" 
 							value="{{c.id}}"
 						    checked>
