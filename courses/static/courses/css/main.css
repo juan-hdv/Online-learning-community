@@ -4,22 +4,22 @@
 
   .card-columns {
     column-count: 1; } }
-@media screen and (min-width: 576px) and (max-width: 768px) {
+@media screen and (min-width: 576px) and (max-width: 840px) {
   html, body {
     font-size: 12px !important; }
 
   .card-columns {
     column-count: 1; } }
-@media screen and (min-width: 769px) and (max-width: 992px) {
+@media screen and (min-width: 836px) and (max-width: 1229px) {
   html, body {
     font-size: 14px; }
 
   .card-columns {
     column-count: 2; } }
-@media screen and (min-width: 993px) and (max-width: 1400px) {
+@media screen and (min-width: 1230px) and (max-width: 1621px) {
   .card-columns {
     column-count: 3; } }
-@media screen and (min-width: 1401px) and (max-width: 1920px) {
+@media screen and (min-width: 1622px) and (max-width: 1920px) {
   .card-columns {
     column-count: 4; } }
 @media screen and (min-width: 1921px) {

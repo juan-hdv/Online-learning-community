@@ -25,10 +25,7 @@ PAYPAL_CLIENTID = 'AeTA5VvJCXRO12TNyR9QEhumUo0M-SFkmzgHYEIdkFecxmNM5xySi62FVCjlZ
 PAYPAL_SECRET = 'EFu-IHq2Q9eVH9wolU4Pme_Aqyq-HekyO0uGVwBY6Bg7aKqmE7nbpy_ny2vV3_RySo2NJHIqSR-NAgty'
 PAYPAL_URLTOKEN = 'https://api.sandbox.paypal.com/v1/oauth2/token'
 PAYPAL_URLORDER = 'https://api.sandbox.paypal.com/v2/checkout/orders'
-PAYPAL_URLCAPTURE = 'https://api.sandbox.paypal.com/v2/checkout/orders/<ORDERID>/capture'
 PAYPAL_URLSHOW = 'https://api.sandbox.paypal.com/v2/checkout/orders/<ORDERID>'
-PAYSERVER_URLRETURN = 'http://127.0.0.1:8000/showpayment'
-PAYSERVER_URLCANCEL = 'http://127.0.0.1:8000/cancelpayment'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

@@ -17,8 +17,11 @@
             var csrftoken = ''; 
         </script>
 
-        <!-- Paypal transaction Scripts -->
-        <script src="https://www.paypal.com/sdk/js?debug=false&client-id=AeTA5VvJCXRO12TNyR9QEhumUo0M-SFkmzgHYEIdkFecxmNM5xySi62FVCjlZPqzcTddKsGWI1veSCoD&currency=USD&intent=capture&commit=true"></script>
+        <!-- Paypal transaction Scripts 
+             Customize the PayPal JavaScript SDK Script:
+             https://developer.paypal.com/docs/checkout/reference/customize-sdk/#query-parameters
+        -->
+        <script src="https://www.paypal.com/sdk/js?debug=false&client-id={{settings.PAYPAL_CLIENTID}}&currency=USD&intent=capture&commit=true"></script>
         <script src="{% static 'courses/js/main.js' %}"></script> <!-- main must be firts as for csrftoken -->
 
         <link rel="stylesheet" href="{% static 'courses/css/main.css' %}" >
