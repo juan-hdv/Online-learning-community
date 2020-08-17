@@ -28,6 +28,40 @@ Python, Django, JavaScript - ECMAScript 6 (ES6), HTML, and CSS.
 8. Authorization: Make course catalog available for non-signed in users and shopping cart available only for signed in users.
 9. Paypal payment integration.
 
+### Project personal experience
+
+It has been hard work and at the same time very enriching.
+
+Thanks to the development of the Capstone project, I have learned and deepened especially in:
+
+#### Django
+- The models: handle the inherited abstract User model; the need to make methods within the model classes; the aggregation functions; using "related_name" for one to many relationships (foreign) and for many to many relatioships (QuerySets and entry_set); using class META to define constrains.
+- Exporting settings variables for templates.
+- Defining a urls (routes) for GET method with parameters and at the same time for POST methods without parameters.
+- REST call to external APIs through requests.
+- Use of custom HTTP error pages.
+- Creating personalized template Tags.
+
+#### Python
+- Operations on strings.
+- Dictionaries and Sets operations.
+- Find / deccode strings Base64 (Interesting).
+
+#### Javascript
+- Use of operations on the DOM and manage events.
+- Use of FETCH to call own and external APIs.
+
+#### HTML
+- Intensive use of Boostrap.
+- Use of cloudflare font-awesome icons.
+- Using modal dialogs (Bootstrap).
+
+#### CSS:
+- Use of the SCSS language.
+
+### Difficulties
+
+I have encountered great difficulties especially in the integration with Paypal, particularly due to the lack of good  documentation. I've wasted lot of time on outdated documents.
 
 ### Project files and directories
 * courses/:  Aplication directory (Application name: courses)
