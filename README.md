@@ -1,6 +1,6 @@
-# cs50-2020-capstone 
+# cs50-2020-capstone
 CS50W Capstone project
-Arts and Crafts Courses 
+Arts and Crafts Courses
 
 ### Author/Date
 
@@ -9,24 +9,25 @@ Arts and Crafts Courses
 ## INTRODUCTION
 ### Description
 
-An skillshare.com / Udemy.com like online learning community and selling online courses, that will allow users to browse course catalog, filter courses by categories, search for courses, see courses details, add/delete courses to/from a shoping cart, include course adds to orders, give rates and reviews, check ratings and reviews from other users and, finally, checkout orders in the shopping cart. 
+An skillshare.com / Udemy.com like online learning community and selling online courses, that will allow users to browse course catalog, filter courses by categories, search for courses, see courses details, add/delete courses to/from a shopping cart, include course adds to orders, give rates and reviews, check ratings and reviews from other users and, finally, checkout orders in the shopping cart.
 
 ### Technologies
 Python, Django, JavaScript - ECMAScript 6 (ES6), HTML, and CSS.
 
 ## PROJECT DETAILS
-### General implemented requirements 
+### General implemented requirements
 
-0- Authentication: allow user to login and logout the site.
-1- Show course catalog.
-2- Filter courses by multiple categories.
-3- Filter courses by a filter string. Filter string is searched into the courses titles and descriptions. 
-4- Show course details and prepare an order with course adds. Some of the adds are charged, some others are free.
-5- Add an order to the shopping cart. An Order includes: course, selected adds (some free some charged), items prices and total price. 
-6- Show orders in the shoping cart and an icon with the number of selected courses (if any). 
-7- Give course ratings/reviews and show course ratings average/reviews.
-8- Authorization: Make course catalog available for non signed in users and shoping cart available only for signed in users.
-9- Paypal payment integration.
+0. Authentication: allow user to login and logout the site.
+1. Show course catalog.
+2. Filter courses by multiple categories.
+3. Filter courses by a filter string. Filter string is searched into the course’s titles and descriptions.
+4. Show course details and prepare an order with course adds. Some of the adds are charged, some others are free.
+5. Add an order to the shopping cart. An Order includes course, selected adds (some free some charged), items prices and total price.
+6. Show orders in the shopping cart and an icon with the number of selected courses (if any).
+7. Give course ratings/reviews and show course ratings average/reviews.
+8. Authorization: Make course catalog available for non-signed in users and shopping cart available only for signed in users.
+9. Paypal payment integration.
+
 
 ### Project files and directories
 * courses/:  Aplication directory (Application name: courses)
@@ -41,7 +42,7 @@ Python, Django, JavaScript - ECMAScript 6 (ES6), HTML, and CSS.
 				* main.css.map: Map file create by the scss compiler.
 			* js/:
 				* main.js:  Javascript code for: Filtering by categories and by filter string; configuring an Order with course adds; rating and write reviews.
-				* paypal.js: Javascriot code for paypal API integration for order payments. JS Fetch is used for server services calls. 
+				* paypal.js: Javascriot code for paypal API integration for order payments. JS Fetch is used for server services calls.
 			* favicon.ico: small icon associated with the website
 	* templates/
 		* courses/:  Templates for courses application
@@ -61,10 +62,10 @@ Python, Django, JavaScript - ECMAScript 6 (ES6), HTML, and CSS.
 	* apps.py: registered apps for the current project
 	* context_processors: export som settings variables definitions to be used in templates: FILTER_INITIAL_NAME,PAYPAL_CLIENTID.
 	* models.py: app models.
-		* User(AbstractUser): A User can create many Orders / A user can write reviews for many courses in CourseReview (ratings/reviews) 
+		* User(AbstractUser): A User can create many Orders / A user can write reviews for many courses in CourseReview (ratings/reviews)
 		* Course: A Course have one CourseProvider
 		* CourseProvider: A CourseProvider can proved many Courses.
-		* CourseCategory: A CourseCategory is associated with many Courses / A Course have ono or many CourseCategory's 
+		* CourseCategory: A CourseCategory is associated with many Courses / A Course have ono or many CourseCategory's
 		* CourseAdd: A CourseAdd belongs to one Course / A Course have cero o many CourseAdd's
 		* CourseReviews: A course review/rating is written by a User for a Course
 		* Order: An Order is associated with on User / A User is asociated with cero o many Order's
@@ -72,10 +73,10 @@ Python, Django, JavaScript - ECMAScript 6 (ES6), HTML, and CSS.
 		* OrderSubitem:	An OrderSubitem is part of only one OrderItem, and is assoated with one Course Add
 	* test.py: file for tests
 	* urls.py: html app routes
-	* utils.py: Paypal REST API calls and some utility functions (encode/decode BASE64). 
-	* views.py: app controllers responding to routes 
+	* utils.py: Paypal REST API calls and some utility functions (encode/decode BASE64).
+	* views.py: app controllers responding to routes
 		* Errors:
-			* handler404 
+			* handler404
 		* Catalog
 			* index
 		User athentocation:
@@ -93,21 +94,21 @@ Python, Django, JavaScript - ECMAScript 6 (ES6), HTML, and CSS.
 			* capturePaypalOrder
 			* showPaypalPayment
 			* cancelPaypalPayment
-* project5/   The project directory	
+* project5/   The project directory
 	* asgi.py: ASGI config for project5 project.
-	* setting.py: project setting file (Django settings). Defines som Paypal variables in development environment, then to be moved to env variables in production: PAYPAL_CLIENTID, PAYPAL_SECRET, PAYPAL_URLTOKEN, PAYPAL_URLORDER, PAYPAL_URLSHOW, 
+	* setting.py: project setting file (Django settings). Defines som Paypal variables in development environment, then to be moved to env variables in production: PAYPAL_CLIENTID, PAYPAL_SECRET, PAYPAL_URLTOKEN, PAYPAL_URLORDER, PAYPAL_URLSHOW,
 	* urls.py: html project routes
 	* wsgi.py: WSGI config for project4 project.
-* db.sqlite3: The databse file. 
+* db.sqlite3: The databse file.
 * manage.py:  Django's command-line utility for administrative tasks
-* README.md: This file. 
+* README.md: This file.
 
 ## RUNNING APP in Ubuntu
-### Create an Enviroment 
+### Create an Enviroment
 
  Before running a project, an Environment must be set for Python 3 and requirements.txt must be then installed
  For example to create an environment called: /env-py3.9
- 
+
  First create directory:
  	mkdir env-py3.9
 

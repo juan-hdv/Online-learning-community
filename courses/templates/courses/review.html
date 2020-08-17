@@ -71,12 +71,12 @@
 	        {% for review in courseReviews %}
 	            <li>{{ review.user.username }}: ( {{ review.rating }}/5 ) &nbsp;
 	            <span class="starsBox">
-	            	<span>
+	            	<span> <!-- This additional span for avoiding click scripting -->
 	            	{% for k in 0|range:review.rating %}
 	                <i class="fa fa-star checked"></i>
 	            	{% endfor %}
 	            	{% for k in review.rating|range:5 reversed %}
-	                <i class="fa fa-star checked"></i>
+	                <i class="fa fa-star"></i>
 	            	{% endfor %}    
 	        		</span>
 	        	</span>
