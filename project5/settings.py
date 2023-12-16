@@ -131,3 +131,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'courses/media')
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
+
