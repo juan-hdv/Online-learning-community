@@ -1,4 +1,4 @@
-# cs50-2020-capstone
+# cs50-2020-capstone: ARTS & CRAFTS
 
 CS50W Capstone project
 Arts and Crafts Courses
