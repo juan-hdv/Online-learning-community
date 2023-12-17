@@ -85,8 +85,12 @@ WSGI_APPLICATION = 'project5.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'NAME': os.path.join(BASE_DIR, 'new.sqlite3'),
+    },
+    'test': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db_tests.sqlite3'),
+    },
 }
 
 AUTH_USER_MODEL = "courses.User"
@@ -131,3 +135,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'courses/media')
 
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
+
+TEST_RUNNER = "redgreenunittest.django.runner.RedGreenDiscoverRunner"
