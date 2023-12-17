@@ -207,17 +207,29 @@ I have created an environment called `/env-py3.9`
 
 ### Django commands
 
+Notice that:
+
+`./manage.py ...` is equivalent to `python manage.py ...`
+
 #### Run server
 
-`python manage.py runserver`
+`./manage.py runserver`
 
 Navigate to http://127.0.0.1:8000/
 
 #### Admin superuser
 
-`python manage.py createsuperuser`
+`./manage.py createsuperuser`
 
 #### Migrations
 
-- `python manage.py makemigrations``, Create new migrations based on the changes you have made to your models
-- `python manage.py migrate``, Apply and unapply migrations
+- `./manage.py makemigrations`, Create new migrations based on the changes you have made to your models
+- `./manage.py migrate`, Apply and unapply migrations
+
+#### Tests
+
+- `./manage.py test`
+
+If you want to run only the tests in the CourseModelTest class, you can specify it in the command:
+
+- `./manage.py test courses.models_tests.CourseModelTest`

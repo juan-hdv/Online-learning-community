@@ -1,0 +1,56 @@
+1,1,add_user,Can add user
+2,1,change_user,Can change user
+3,1,delete_user,Can delete user
+4,1,view_user,Can view user
+5,2,add_course,Can add course
+6,2,change_course,Can change course
+7,2,delete_course,Can delete course
+8,2,view_course,Can view course
+9,3,add_courseadd,Can add course add
+10,3,change_courseadd,Can change course add
+11,3,delete_courseadd,Can delete course add
+12,3,view_courseadd,Can view course add
+13,4,add_order,Can add order
+14,4,change_order,Can change order
+15,4,delete_order,Can delete order
+16,4,view_order,Can view order
+17,5,add_orderitem,Can add order item
+18,5,change_orderitem,Can change order item
+19,5,delete_orderitem,Can delete order item
+20,5,view_orderitem,Can view order item
+21,6,add_ordersubitem,Can add order subitem
+22,6,change_ordersubitem,Can change order subitem
+23,6,delete_ordersubitem,Can delete order subitem
+24,6,view_ordersubitem,Can view order subitem
+25,7,add_coursecategory,Can add course category
+26,7,change_coursecategory,Can change course category
+27,7,delete_coursecategory,Can delete course category
+28,7,view_coursecategory,Can view course category
+29,8,add_courseprovider,Can add course provider
+30,8,change_courseprovider,Can change course provider
+31,8,delete_courseprovider,Can delete course provider
+32,8,view_courseprovider,Can view course provider
+33,9,add_coursereviews,Can add course reviews
+34,9,change_coursereviews,Can change course reviews
+35,9,delete_coursereviews,Can delete course reviews
+36,9,view_coursereviews,Can view course reviews
+37,10,add_logentry,Can add log entry
+38,10,change_logentry,Can change log entry
+39,10,delete_logentry,Can delete log entry
+40,10,view_logentry,Can view log entry
+41,11,add_permission,Can add permission
+42,11,change_permission,Can change permission
+43,11,delete_permission,Can delete permission
+44,11,view_permission,Can view permission
+45,12,add_group,Can add group
+46,12,change_group,Can change group
+47,12,delete_group,Can delete group
+48,12,view_group,Can view group
+49,13,add_contenttype,Can add content type
+50,13,change_contenttype,Can change content type
+51,13,delete_contenttype,Can delete content type
+52,13,view_contenttype,Can view content type
+53,14,add_session,Can add session
+54,14,change_session,Can change session
+55,14,delete_session,Can delete session
+56,14,view_session,Can view session

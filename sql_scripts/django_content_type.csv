@@ -1,0 +1,14 @@
+1,courses,user
+2,courses,course
+3,courses,courseadd
+4,courses,order
+5,courses,orderitem
+6,courses,ordersubitem
+7,courses,coursecategory
+8,courses,courseprovider
+9,courses,coursereviews
+10,admin,logentry
+11,auth,permission
+12,auth,group
+13,contenttypes,contenttype
+14,sessions,session
